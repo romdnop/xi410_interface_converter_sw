@@ -13,7 +13,8 @@ The idea is to hold the value for 5-10seconds to allow adjustment of the OpAmp o
 
 TIM3_CH4 in PWM mode
 */
-void run_calibration()
+
+void init_pwm()
 {
     //TIM2 clock is 25MHz
     //PWM freq is 5kHz
@@ -50,8 +51,14 @@ void run_calibration()
 
     LL_TIM_SetAutoReload(PWM_TIMER,TIMER_ARR_VALUE);
     //LL_TIM_CC_SetUpdate(TIM2,LL_T)
-    LL_TIM_OC_SetCompareCH4(PWM_TIMER,100);
+    //LL_TIM_OC_SetCompareCH4(PWM_TIMER,100);
     LL_TIM_EnableCounter(PWM_TIMER);
+
+    setDutyCycle(50);
+}
+
+void run_calibration()
+{
 
     //uint32_t pwm_outputs[4] = {1, (uint32_t)(OUTPUT_PWM_FREQ*0.2),(uint32_t)(OUTPUT_PWM_FREQ*0.55),(uint32_t)(OUTPUT_PWM_FREQ)};
     uint32_t pwm_cycle[4] = {1,20,55,100};
@@ -79,9 +86,9 @@ void run_calibration()
 
 
 //sets duty cycle in %
-void setDutyCycle(int perc)
+void setDutyCycle(float perc)
 {
     uint32_t timerDutyCylceUnits;
-    timerDutyCylceUnits = (uint32_t)(TIMER_ARR_VALUE*perc/100);
+    timerDutyCylceUnits = (uint32_t)(TIMER_ARR_VALUE*perc/100.0);
     LL_TIM_OC_SetCompareCH4(PWM_TIMER,timerDutyCylceUnits);
 }

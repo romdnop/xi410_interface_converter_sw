@@ -3,6 +3,7 @@
     "cortex-debug.openocdPath": "C:\\USERS\\USER\\APPDATA\\ROAMING\\CODE\\USER\\GLOBALSTORAGE\\BMD.STM32-FOR-VSCODE\\@XPACK-DEV-TOOLS\\OPENOCD\\0.12.0-2.1\\.CONTENT\\BIN\\OPENOCD.EXE",
     "files.associations": {
         "main.h": "c",
-        "stm32f0xx_ll_tim.h": "c"
+        "stm32f0xx_ll_tim.h": "c",
+        "calibration.h": "c"
     }
 }

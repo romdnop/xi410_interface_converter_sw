@@ -13,11 +13,11 @@
 #define TIMER_CLK   ((uint32_t)48000000)
 
 #define OUTPUT_PWM_FREQ   ((uint32_t)(20000))
-#define TIMER_ARR_VALUE ((uint16_t)(TIMER_CLK/OUTPUT_PWM_FREQ))//value to be written to ARR register, sets PWM freq to OUTPUT_PWM_FREQ
+#define TIMER_ARR_VALUE ((uint32_t)(TIMER_CLK/OUTPUT_PWM_FREQ))//value to be written to ARR register, sets PWM freq to OUTPUT_PWM_FREQ
 
-
+void init_pwm();
 void run_calibration();
-void setDutyCycle(int perc);
+void setDutyCycle(float perc);
 
 
 #endif

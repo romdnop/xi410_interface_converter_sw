@@ -45,7 +45,7 @@ ADC_HandleTypeDef hadc;
 I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN PV */
-
+ADT74X0 temp_sensor;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,7 +55,7 @@ static void MX_ADC_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
-//static uint32_t isCalibButtonPressed();
+static uint32_t isCalibButtonPressed();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -75,7 +75,9 @@ enum ModeEnumTypeDef{
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  float current_temp = 0.0;
+  uint32_t i = 0;
+  uint32_t errorCount = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -113,7 +115,28 @@ int main(void)
   //   }
   //   //save variable to FLASH
 
-  run_calibration();
+  init_pwm();
+
+  if(isCalibButtonPressed())
+  {
+    run_calibration();
+  }
+
+  setDutyCycle(0);
+
+  temp_sensor.adti2c = &hi2c1; // Your I2C Handler
+  ADT74x0_Init(&temp_sensor, ADT74X0_DEVICE_ADDR); // I2C address depends of A0 and A1 pins
+	ADT74x0_Reset(&temp_sensor); // Optional
+	ADT74x0_SetResolution(&temp_sensor, ADT74X0_16BITS); // Put the device in 16 bits resolution
+  
+  //HAL_Delay(100);
+  if(ADT74x0_Ready((ADT74X0 *)&temp_sensor))
+  {
+    ADT74x0_ReadTemp(&temp_sensor);
+  }
+  
+
+  
 
   // }
   /* USER CODE END 2 */
@@ -126,6 +149,42 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     led_blink(1000);
+
+    if(ADT74x0_Ready((ADT74X0 *)&temp_sensor))
+    {
+      if (ADT74x0_ReadTemp(&temp_sensor) != HAL_OK) {
+	      //Error_Handler();
+        //blink 10 times and reset
+        for(i=0;i<10;i++)
+        {
+          led_blink(250);
+        }
+        //reset
+        NVIC_SystemReset();
+	    }
+      else
+      {
+        //current_temp = temp_sensor.deg_data;
+        setDutyCycle(ADT74x0_TempToPWM(&temp_sensor));
+      }
+      
+      //buff[0] = (current_temp>>8)&0xFF;
+      //buff[1] = current_temp & 0xFF;
+      //buff[2] = CRC8((uint8_t *)&buff,2); //checksum calculation
+      //buff[3] = '\r';
+      //CDC_Transmit_FS((uint8_t *)&buff,4);
+    }
+    else
+    {
+      errorCount++;
+      led_blink(250);
+    }
+
+    if(errorCount>=10)
+    {
+      NVIC_SystemReset();
+    }
+    //HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -364,7 +423,7 @@ static void MX_GPIO_Init(void)
   /**/
   GPIO_InitStruct.Pin = BTN_CAL_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
   LL_GPIO_Init(BTN_CAL_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -374,7 +433,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 static uint32_t isCalibButtonPressed()
 {
-  return LL_GPIO_IsInputPinSet(BTN_CAL_GPIO_Port, BTN_CAL_Pin);
+  return !LL_GPIO_IsInputPinSet(BTN_CAL_GPIO_Port, BTN_CAL_Pin);
   //return 0;
 }
 /* USER CODE END 4 */

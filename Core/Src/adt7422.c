@@ -19,7 +19,7 @@ void ADT74x0_Init(ADT74X0 *adt74x0, uint8_t addr) {
 	adt74x0->int_polarity = ADT74X0_INT_ACTIVE_LOW;
 	adt74x0->int_ct_mode = ADT74X0_INTERRUPT_MODE;
 	adt74x0->operation_mode = ADT74X0_CONTINOUS_MODE;
-	adt74x0->resolution = ADT74X0_13BITS;
+	adt74x0->resolution = ADT74X0_16BITS;
 	adt74x0->address = (uint16_t) (addr << 1);
 }
 
@@ -37,7 +37,7 @@ void ADT74x0_Reset(ADT74X0 *adt74x0) {
 	adt74x0->int_polarity = ADT74X0_INT_ACTIVE_LOW;
 	adt74x0->int_ct_mode = ADT74X0_INTERRUPT_MODE;
 	adt74x0->operation_mode = ADT74X0_CONTINOUS_MODE;
-	adt74x0->resolution = ADT74X0_13BITS;
+	adt74x0->resolution = ADT74X0_16BITS;
 }
 
 /**
@@ -276,4 +276,28 @@ void ADT74x0_RawToTemp(ADT74X0 *adt74x0) {
 			adt74x0->deg_data = ((float) (adt74x0->raw_data)) / 16.0;
 		}
 	}
+}
+
+
+//converts temperature to PWM value
+/*
+
+*/
+uint16_t ADT74x0_TempToPWM(ADT74X0 *adt74x0)
+{
+	float perc = 0;
+	
+
+	if(adt74x0->deg_data <= -30.0)
+	{
+		return 0;
+	}
+	if(adt74x0->deg_data >= 50.0)
+	{
+		return 100;
+	}
+
+	perc = (adt74x0->deg_data)*(100.0f/80.0f);
+	return (uint16_t)(perc - (perc - (int) perc));
+
 }
