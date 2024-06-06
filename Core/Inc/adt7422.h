@@ -128,4 +128,5 @@ void ADT74x0_SetTHyst(ADT74X0 *adt74x0, uint8_t newTemp);
 HAL_StatusTypeDef ADT74x0_ReadTemp(ADT74X0 *adt74x0);
 void ADT74x0_RawToTemp(ADT74X0 *adt74x0);
 uint16_t ADT74x0_TempToPWM(ADT74X0 *adt74x0);
+uint32_t ADT74x0_TempToCounts(ADT74X0 *adt74x0);
 #endif /* INC_ADT74X0_H_ */

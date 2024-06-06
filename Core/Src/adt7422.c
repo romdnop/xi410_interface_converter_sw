@@ -301,3 +301,31 @@ uint16_t ADT74x0_TempToPWM(ADT74X0 *adt74x0)
 	return (uint16_t)(perc - (perc - (int) perc));
 
 }
+
+/// @brief Converts current temp to value (from 0 to TIMER_ARR_VALUE) in temperature range from -30 to 50 degC ()
+/// @param adt74x0 
+/// @return 
+uint32_t ADT74x0_TempToCounts(ADT74X0 *adt74x0)
+{
+	float perc = 0;
+	
+
+	if(adt74x0->deg_data <= -20.0)
+	{
+		return PWM_TEMP_LOW;
+	}
+	if(adt74x0->deg_data >= 45.0)
+	{
+		return PWM_TEMP_HIGH;
+	}
+
+
+	if(adt74x0->deg_data < 0){
+
+	}
+	else
+	{
+		perc = (adt74x0->deg_data)/(65.0f/(PWM_TEMP_HIGH - PWM_TEMP_LOW));
+	} 
+	return (uint32_t)(perc - (perc - (int) perc) + PWM_TEMP_LOW);
+}

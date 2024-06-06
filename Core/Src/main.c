@@ -165,7 +165,10 @@ int main(void)
       else
       {
         //current_temp = temp_sensor.deg_data;
-        setDutyCycle(ADT74x0_TempToPWM(&temp_sensor));
+        //setDutyCycle(ADT74x0_TempToPWM(&temp_sensor));
+        //-30..50degC
+        //encoded in 32bits
+        LL_TIM_OC_SetCompareCH4(PWM_TIMER,ADT74x0_TempToCounts(&temp_sensor)); //32bit value
       }
       
       //buff[0] = (current_temp>>8)&0xFF;
