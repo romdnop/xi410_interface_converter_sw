@@ -61,36 +61,41 @@ void run_calibration()
 {
 
     //uint32_t pwm_outputs[4] = {1, (uint32_t)(OUTPUT_PWM_FREQ*0.2),(uint32_t)(OUTPUT_PWM_FREQ*0.55),(uint32_t)(OUTPUT_PWM_FREQ)};
-    uint32_t pwm_cycle[2] = {TIMER_ARR_VALUE*0.4, TIMER_ARR_VALUE*0.65};
+    uint32_t pwm_cycle[4] = {0, PWM_TEMP_LOW, PWM_TEMP_ZERO, PWM_TEMP_HIGH};
     //setDutyCycle(99);
     int i = 0;
+    int j = 0;
     while(1)
     {
         //to find the linear region
-        /*
-        for(i=0;i<TIMER_ARR_VALUE;i++)
-        {
-            LL_mDelay(1);
-            LL_TIM_OC_SetCompareCH4(PWM_TIMER,i);
-            //TIM3->SR &= ~LL_TIM_SR_CC4OF;
-        }
-        */  
         
-        for(i=0;i<2;i++)
+        for(j=0;j<5;j++)
         {
-            //blink
-            LL_GPIO_ResetOutputPin(LED_STAT_GPIO_Port,LED_STAT_Pin);
-            LL_mDelay(100);
-            LL_GPIO_SetOutputPin(LED_STAT_GPIO_Port,LED_STAT_Pin);
-            LL_mDelay(100);
-            LL_TIM_OC_SetCompareCH4(PWM_TIMER,pwm_cycle[i]);
-            //setDutyCycle(pwm_cycle[i]);
-            LL_mDelay(3000);
-            //TIM2->ARR = pwm_outputs[i];
-            //LL_TIM_SetAutoReload(TIM2,pwm_outputs[i]);
+            for(i=0;i<TIMER_ARR_VALUE;i++)
+            {
+                LL_mDelay(1);
+                LL_TIM_OC_SetCompareCH4(PWM_TIMER,i);
+                //TIM3->SR &= ~LL_TIM_SR_CC4OF;
+            }
         }
-        
-        i=0;
+         
+        for(j=0;j<3;j++)
+        {
+            for(i=0;i<4;i++)
+            {
+                //blink
+                LL_GPIO_ResetOutputPin(LED_STAT_GPIO_Port,LED_STAT_Pin);
+                LL_mDelay(100);
+                LL_GPIO_SetOutputPin(LED_STAT_GPIO_Port,LED_STAT_Pin);
+                LL_mDelay(100);
+                LL_TIM_OC_SetCompareCH4(PWM_TIMER,pwm_cycle[i]);
+                //setDutyCycle(pwm_cycle[i]);
+                LL_mDelay(3000);
+                //TIM2->ARR = pwm_outputs[i];
+                //LL_TIM_SetAutoReload(TIM2,pwm_outputs[i]);
+            }
+        }
+        //i=0;
         
         
     }

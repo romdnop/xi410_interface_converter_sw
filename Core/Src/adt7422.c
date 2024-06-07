@@ -305,27 +305,43 @@ uint16_t ADT74x0_TempToPWM(ADT74X0 *adt74x0)
 /// @brief Converts current temp to value (from 0 to TIMER_ARR_VALUE) in temperature range from -30 to 50 degC ()
 /// @param adt74x0 
 /// @return 
+
+/*
+def tempToCounts(temp):
+    if temp <= TEMP_LOW:
+        return PWM_TEMP_LOW
+    if temp >= TEMP_HIGH:
+        return PWM_TEMP_HIGH
+    if temp >= 0:
+        counts = temp/PWM_TEMP_RESOLUTION + abs(TEMP_LOW)/PWM_TEMP_RESOLUTION + PWM_TEMP_LOW
+    if temp < 0:
+        counts = abs(temp)/PWM_TEMP_RESOLUTION + PWM_TEMP_LOW
+    return counts
+*/
 uint32_t ADT74x0_TempToCounts(ADT74X0 *adt74x0)
 {
-	float perc = 0;
-	
+	uint32_t counts = 0;
+	float pwmTempResolution = PWM_TEMP_RESOLUTION;
+	//float tempLow = TEMP_LOW;
 
-	if(adt74x0->deg_data <= -20.0)
+	if(adt74x0->deg_data <= TEMP_LOW)
 	{
 		return PWM_TEMP_LOW;
 	}
-	if(adt74x0->deg_data >= 45.0)
+	if(adt74x0->deg_data >= TEMP_HIGH)
 	{
 		return PWM_TEMP_HIGH;
 	}
 
 
-	if(adt74x0->deg_data < 0){
-
+	if(adt74x0->deg_data >= 0.0){
+		counts = (uint32_t)(adt74x0->deg_data/pwmTempResolution - (TEMP_LOW)/pwmTempResolution + PWM_TEMP_LOW);
 	}
 	else
 	{
-		perc = (adt74x0->deg_data)/(65.0f/(PWM_TEMP_HIGH - PWM_TEMP_LOW));
+		counts = -adt74x0->deg_data/PWM_TEMP_RESOLUTION + PWM_TEMP_LOW;
+		//perc = (adt74x0->deg_data)/(65.0f/(PWM_TEMP_HIGH - PWM_TEMP_LOW));
 	} 
-	return (uint32_t)(perc - (perc - (int) perc) + PWM_TEMP_LOW);
+	//return (uint32_t)(perc - (perc - (int) perc) + PWM_TEMP_LOW);
+	return counts;
 }

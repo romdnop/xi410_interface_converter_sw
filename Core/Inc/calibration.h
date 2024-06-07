@@ -19,8 +19,14 @@ void init_pwm();
 void run_calibration();
 void setDutyCycle(float perc);
 
-#define PWM_TEMP_LOW ((uint32_t)(TIMER_ARR_VALUE*0.4))
-#define PWM_TEMP_HIGH ((uint32_t)(TIMER_ARR_VALUE*0.65))
+#define PWM_TEMP_LOW ((uint32_t)(TIMER_ARR_VALUE*0.3)) //0.4
+#define PWM_TEMP_HIGH ((uint32_t)(TIMER_ARR_VALUE*0.55)) //0.65
+
+#define PWM_TEMP_RESOLUTION  (float)((TEMP_HIGH - (TEMP_LOW))/(PWM_TEMP_HIGH - PWM_TEMP_LOW))
+#define PWM_TEMP_ZERO  (uint32_t)(PWM_TEMP_LOW - (TEMP_LOW) / PWM_TEMP_RESOLUTION)
+
+#define TEMP_LOW ((float)(-20))
+#define TEMP_HIGH ((float)(45))
 
 
 #endif
