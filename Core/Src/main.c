@@ -54,6 +54,7 @@ static void MX_GPIO_Init(void);
 static void MX_ADC_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 static uint32_t isCalibButtonPressed();
 /* USER CODE END PFP */
@@ -101,6 +102,7 @@ int main(void)
   MX_ADC_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   // if(isCalibButtonPressed())
   // {
@@ -115,8 +117,12 @@ int main(void)
   //   }
   //   //save variable to FLASH
 
-  init_pwm();
+  for(i=0;i<3;i++)
+  {
+    led_blink(100);
+  }
 
+  init_pwm();
   if(isCalibButtonPressed())
   {
     run_calibration();
@@ -135,7 +141,7 @@ int main(void)
     ADT74x0_ReadTemp(&temp_sensor);
   }
   
-
+  
   
 
   // }
@@ -148,6 +154,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    //LL_IWDG_ReloadCounter()
+    LL_IWDG_ReloadCounter(IWDG);
     led_blink(1000);
 
     if(ADT74x0_Ready((ADT74X0 *)&temp_sensor))
@@ -187,6 +195,17 @@ int main(void)
     {
       NVIC_SystemReset();
     }
+
+    if(isCalibButtonPressed())
+    {
+      LL_mDelay(100);
+      if(isCalibButtonPressed())
+      {
+        NVIC_SystemReset(); //will start with calibration on the next restart
+        //run_calibration();
+      }
+    }
+
     //HAL_Delay(1000);
   }
   /* USER CODE END 3 */
@@ -205,10 +224,12 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI14|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI14|RCC_OSCILLATORTYPE_LSI
+                              |RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSI14State = RCC_HSI14_ON;
   RCC_OscInitStruct.HSI14CalibrationValue = 16;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
@@ -337,6 +358,36 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  LL_IWDG_Enable(IWDG);
+  LL_IWDG_EnableWriteAccess(IWDG);
+  LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_128);
+  LL_IWDG_SetReloadCounter(IWDG, 3125);
+  while (LL_IWDG_IsReady(IWDG) != 1)
+  {
+  }
+
+  LL_IWDG_SetWindow(IWDG, 3125);
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
 
 }
 

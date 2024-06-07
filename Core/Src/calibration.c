@@ -65,12 +65,15 @@ void run_calibration()
     //setDutyCycle(99);
     int i = 0;
     int j = 0;
+    //disable watchdog timer
+
     while(1)
     {
         //to find the linear region
         
-        for(j=0;j<5;j++)
+        for(j=0;j<3;j++)
         {
+            LL_IWDG_ReloadCounter(IWDG);
             for(i=0;i<TIMER_ARR_VALUE;i++)
             {
                 LL_mDelay(1);
@@ -83,6 +86,7 @@ void run_calibration()
         {
             for(i=0;i<4;i++)
             {
+                LL_IWDG_ReloadCounter(IWDG);
                 //blink
                 LL_GPIO_ResetOutputPin(LED_STAT_GPIO_Port,LED_STAT_Pin);
                 LL_mDelay(100);
@@ -96,7 +100,7 @@ void run_calibration()
             }
         }
         //i=0;
-        
+        break;
         
     }
 }
